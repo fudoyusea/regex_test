@@ -1,0 +1,11 @@
+class dataGen:
+    feature:
+        length;
+        regex;
+        num;
+        outputStrs;
+
+    method:
+        matchedGen(length, num, regex)
+        unmatchedGen(num, regex)
+

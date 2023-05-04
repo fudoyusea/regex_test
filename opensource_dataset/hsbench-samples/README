@@ -1,0 +1,70 @@
+Sample Input for Hyperscan `hsbench` Performance Measurement
+============================================================
+
+This package contains sample pattern sets and corpora for performance analysis
+of the Hyperscan regular expression matcher using the `hsbench` tool.
+
+More information about Hyperscan can be found at: <http://01.org/hyperscan/>.
+
+
+Pattern Sets
+------------
+
+Three sample pattern sets are in the pcre/ directory.
+
+ - snort_literals: This is a set of 3,316 literal patterns extracted from the
+   sample ruleset included with the Snort 3 network intrusion detection system,
+   available at <https://github.com/snortadmin/snort3>. Some of these are
+   marked with the HS_FLAG_CASELESS flag so that they match case-insensitively,
+   and all of them use HS_FLAG_SINGLEMATCH to limit matching to once per scan
+   for each pattern.
+
+ - snort_pcres: This is a set of 847 regular expressions that were also
+   extracted from the sample ruleset includes with Snort 3, taken from rules
+   targeted at HTTP traffic. It is important to note that these are just the
+   patterns extracted from the rules' "pcre:" options, and that scanning for
+   them in a single pattern set with Hyperscan is not semantically equivalent
+   to scanning for these rules within Snort; this is a sample case intended to
+   show Hyperscan's capability for matching expressions simultaneously.
+
+ - teakettle_2500: This is a set of 2,500 synthetic pattern generated with a
+   script that produces regular expressions of limited complexity; dictionary
+   words separated by character class repeats and alternations.
+
+The format for these pattern sets is a text file, with one ID and expression
+per line. For example, the first few lines of the teakettle_2500 set are:
+
+    1:/loofas.+stuffer[^\n]*interparty[^\n]*godwit/is
+    2:/procurers.*arsons/s
+    3:/^authoress[^\r\n]*typewriter[^\r\n]*disservices/is
+    4:/praesidiadyeweedisonomic.*reactivating/is
+    5:/times/s
+
+
+Corpora
+-------
+
+Two `hsbench` corpora files are included as sample data for scanning, in the
+corpora/ directory:
+
+ - gutenberg.db: A collection of English-language texts from the Gutenberg
+   project, broken up into 10,240-byte streams of 2,048-byte blocks.
+
+ - alexa200.db: A large traffic sample constructed from a PCAP capture of an
+   automated Web browser browsing a subset of the top sites listed on
+   Alexa.com. This file contains 130,957 blocks (originally corresponding to
+   packets), and only traffic to or from port 80 is included.
+
+These files are SQLite databases designed to allow convenient construction of
+corpora for `hsbench` from arbitrary input. Their format is described in the
+Hyperscan Developer Reference, and some sample scripts are included with
+Hyperscan to construct corpora from common inputs, such as text files and PCAP
+traffic samples.
+
+
+Example Script
+--------------
+
+The script `run_bench.sh`, which takes the location of an `hsbench` binary as
+an argument, can be used to run a standard set of tests with the input data
+described above.

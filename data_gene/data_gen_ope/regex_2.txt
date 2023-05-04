@@ -1,0 +1,10 @@
+1:ab1c.*d.*e.*f.*g.*(h|i).*j.*k.*l.*m.*n.*o.*p.*q.*r.*s.*t.*u.*v.*w.*x.*y.*z
+2:ab2c.*d.*e.*f.*g.*h.*(i|j).*k.*l.*m.*n.*o.*p.*q.*r.*s.*t.*u.*v.*w.*x.*y
+3:ab3c.*d.*e.*f.*g.*h.*i.*(j|k).*l.*m.*n.*o.*p.*q.*r.*s.*t.*u.*v.*w.*x
+4:ab4c.*d.*e.*f.*g.*h.*i.*j.*(k|l).*m.*n.*o.*p.*q.*r.*s.*t.*u.*v.*w
+5:ab5c.*d.*e.*f.*g.*h.*i.*j.*k.*(l|m).*n.*o.*p.*q.*r.*s.*t.*u.*v
+6:ab6c.*d.*e.*f.*g.*h.*i.*j.*k.*l.*(m|n).*o.*p.*q.*r.*s.*t.*u
+7:ab7c.*d.*e.*f.*g.*h.*i.*j.*k.*l.*m.*(n|o).*p.*q.*r.*s.*t
+8:ab8c.*d.*e.*f.*g.*h.*i.*j.*k.*l.*m.*n.*(o|p).*q.*r.*s
+9:ab9c.*d.*e.*f.*g.*h.*i.*j.*k.*l.*m.*n.*o.*(p|q).*r
+10:abc.*d.*e.*f.*g.*h.*i.*j.*k.*l.*m.*n.*o.*p.*q
