@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 
     fclose(fptr);
 
-    printf("%f", matchingTotalTime*1000*4);
+    printf("%f", matchingTotalTime*1000);
     printf("\n");
     printf("%d", matchedTotalNum);
     return 0;
