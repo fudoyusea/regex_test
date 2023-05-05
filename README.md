@@ -4,12 +4,12 @@
 
 #### regex
 1.格式化存储：\<no\>:/\<regex\>/\<flag\>;
-文件名中注明format(eg.regex_format.data);\
+文件名中注明format(eg.regex_format.data);
 
 2.简单存储：\<regex\>;
 
 #### corpora
-1.数据库存储：参考gutenberg.db语义库;\
+1.数据库存储：参考gutenberg.db语义库;
 
 2.简单存储：以文本形式存储即可;
 
