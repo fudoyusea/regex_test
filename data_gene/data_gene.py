@@ -50,8 +50,8 @@ def geneData(regexs, output, dScale):
 
 if __name__ == "__main__":
     dataScale = 10
-    outputPath = "../data_gen_results/dataGen_regex_javaclassconcate" + str(dataScale) +".txt"
-    regexPath = "/home/fudoyusea/tyy_work/data_real/lyl/java_classes.data"
+    outputPath = "./data_gen_results/dataGen_regex_javaclassconcate" + str(dataScale) +".txt"
+    regexPath = "../regex/xxx.data"
     regexList = readRegex(regexPath)
     geneData(regexList, outputPath, dataScale)
     
