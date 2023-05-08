@@ -35,7 +35,7 @@ class hyperscanTest
 
 public:
 
-    hyperscanTest(std::string rPath, std::vector<dataBlock>  inputDb, bool isFormat);
+    hyperscanTest(std::string rPath, std::string dPath, bool isFormat);
     ~hyperscanTest();
     int compilePattern();
     double compileTest();
@@ -45,6 +45,7 @@ public:
 private:
 
     std::string regexPath;              // regex store path
+    std::string dataPath;               // corpora store path
     bool isRegexFormat;                 // regex is format data(1:/<regex>/<opt>)
     std::vector<regPatt> originRegexs;  // regex array
     regexPatternArray regexsArray;      // regex combinated array
@@ -58,7 +59,7 @@ public:
 
 };
 
-hyperscanTest::hyperscanTest(std::string rPath, std::vector<dataBlock>  inputDb, bool isFormat) : regexPath(rPath), isRegexFormat(isFormat) {
+hyperscanTest::hyperscanTest(std::string rPath, std::string dPath, bool isFormat) : regexPath(rPath), dataPath(dPath), isRegexFormat(isFormat) {
     // initialize regex pattern
     std::ifstream regexIn(regexPath);
     std::string s;
@@ -96,15 +97,26 @@ hyperscanTest::hyperscanTest(std::string rPath, std::vector<dataBlock>  inputDb,
 
     regexCount = num;
 
-    // initialize regex pattern array
+    /**
+     * initialize regex pattern array
+    */
     for(int i = 0; i < regexCount; ++i) {
         regexsArray.ids[i] = i;
         regexsArray.regexs[i] = originRegexs[i].regex;
         regexsArray.flags[i] = HS_FLAG_CASELESS;
     }
 
-    // initialize data array
-    datasArray = inputDb;
+    /**
+     * read scanning corpora data;
+     * flag == 0:load data from txt file;
+     * flag == 1:load data from database file;
+    */
+    int flag;
+    if(dataPath[dataPath.size()-1] == 'b')
+        flag = 1;
+    else
+        flag = 0;  
+    load_data(dataPath, datasArray, flag);
 
     // initialize matched num array
     matchedNum.resize(regexCount);
@@ -197,21 +209,11 @@ int main(int argc, char **argv) {
     std::string dataPath = argv[2];//"../data_gene/data_gen_results/dataGen_regex_javaclassconcate10000.txt";
 
     /**
-     * read scanning corpora data;
-     * flag == 0:load data from txt file;
-     * flag == 1:load data from database file;
-    */
-    std::vector<dataBlock> inputBlock;
-    int flag;
-    if(dataPath[dataPath.size()-1] == 'b')
-        flag = 1;
-    else
-        flag = 0;  
-    load_data(dataPath, inputBlock, flag);
-
-    /**
      * regex config;
+     * flag == 0:load data with format;
+     * flag == 1:load data without format;
     */
+    int flag;
     if(regexPath.find("format") != std::string::npos)
         flag = true;
     else
@@ -220,7 +222,7 @@ int main(int argc, char **argv) {
     /**
      * compile;
     */
-    hyperscanTest hsTest(regexPath, inputBlock, flag);
+    hyperscanTest hsTest(regexPath, dataPath, flag);
     double compileTime = hsTest.compileTest();
 
     /**

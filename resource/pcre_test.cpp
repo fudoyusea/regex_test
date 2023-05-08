@@ -16,7 +16,7 @@
 
 class pcreTest {
 public:
-    pcreTest(std::string regexPath, std::vector<dataBlock> inBlocks, bool isFormat);
+    pcreTest(std::string rPath, std::string dPath, bool isFormat);
     ~pcreTest();
     int compilePattern();
     double compileTest();
@@ -24,6 +24,7 @@ public:
 
 private:
     std::string regexPath;
+    std::string dataPath;        
     bool isRegexFormat;
     std::vector<std::string> regexArray;
     std::vector<dataBlock> dataArray;
@@ -34,7 +35,7 @@ private:
 
 };
 
-pcreTest::pcreTest(std::string rPath, std::vector<dataBlock> inBlocks, bool isFormat) : regexPath(rPath),dataArray(inBlocks),isRegexFormat(isFormat){
+pcreTest::pcreTest(std::string rPath, std::string dPath, bool isFormat) : regexPath(rPath),dataPath(dPath),isRegexFormat(isFormat){
 
     // initialize regex array;
     std::ifstream regexIn(regexPath);
@@ -66,6 +67,19 @@ pcreTest::pcreTest(std::string rPath, std::vector<dataBlock> inBlocks, bool isFo
             getline(regexIn, s, ':');
         }
     }
+
+    /**
+     * read scanning corpora data;
+     * flag == 0:load data from txt file;
+     * flag == 1:load data from database file;
+    */
+    int flag;
+    if(dataPath[dataPath.size()-1] == 'b')
+        flag = 1;
+    else
+        flag = 0;  
+    load_data(dataPath, dataArray, flag);
+
 
     regexCount = num;
 
@@ -155,21 +169,9 @@ int main(int argc, char **argv) {
     std::string dataPath = argv[2];
 
     /**
-     * read scanning corpora data;
-     * flag == 0:load data from txt file;
-     * flag == 1:load data from database file;
-    */
-    int flag;
-    if(dataPath[dataPath.size()-1] == 'b')
-        flag = 1;
-    else
-        flag = 0;  
-    std::vector<dataBlock> inputBlock;
-    load_data(dataPath, inputBlock, flag);
-
-    /**
      * regex config;
     */
+    int flag;
     if(regexPath.find("format") != std::string::npos)
         flag = true;
     else
@@ -178,7 +180,7 @@ int main(int argc, char **argv) {
     /**
      * compile;
     */
-    pcreTest pTest(regexPath, inputBlock, flag);
+    pcreTest pTest(regexPath, dataPath, flag);
     double compileTime = pTest.compileTest();
 
     /**

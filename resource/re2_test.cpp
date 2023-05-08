@@ -18,7 +18,7 @@
 
 class re2Test {
 public:
-    re2Test(std::string regexPath, std::vector<dataBlock> inBlocks, bool isFormat);
+    re2Test(std::string regexPath, std::string dataPath, bool isFormat);
     ~re2Test();
     int compilePattern();
     double compileTest();
@@ -26,6 +26,7 @@ public:
 
 private:
     std::string regexPath;
+    std::string dataPath;
     bool isRegexFormat;
 
     std::vector<std::string> regexArray;
@@ -35,7 +36,7 @@ private:
 
 };
 
-re2Test::re2Test(std::string rPath, std::vector<dataBlock> inBlocks, bool isFormat): regexPath(rPath), dataArray(inBlocks), isRegexFormat(isFormat){
+re2Test::re2Test(std::string rPath, std::string dPath, bool isFormat): regexPath(rPath), dataPath(dPath), isRegexFormat(isFormat){
 
     // initialize regex array;
     std::ifstream regexIn(regexPath);
@@ -66,6 +67,18 @@ re2Test::re2Test(std::string rPath, std::vector<dataBlock> inBlocks, bool isForm
     }
 
     regexCount = num;
+
+    /**
+     * read scanning corpora data;
+     * flag == 0:load data from txt file;
+     * flag == 1:load data from database file;
+    */
+    int flag;
+    if(dataPath[dataPath.size()-1] == 'b')
+        flag = 1;
+    else
+        flag = 0;  
+    load_data(dataPath, dataArray, flag);
 
     // initialize regexdatabase;
     re2Database.resize((std::size_t)(regexCount));
@@ -133,21 +146,9 @@ int main(int argc, char **argv) {
     std::string dataPath = argv[2];
 
     /**
-     * read scanning corpora data;
-     * flag == 0:load data from txt file;
-     * flag == 1:load data from database file;
-    */
-    int flag;
-    if(dataPath[dataPath.size()-1] == 'b')
-        flag = 1;
-    else
-        flag = 0;  
-    std::vector<dataBlock> inputBlock;
-    load_data(dataPath, inputBlock, flag);
-
-    /**
      * regex config;
     */
+    int flag;
     if(regexPath.find("format") != std::string::npos)
         flag = true;
     else
@@ -156,7 +157,7 @@ int main(int argc, char **argv) {
     /**
      * compile;
     */
-    re2Test rTest(regexPath, inputBlock, flag);
+    re2Test rTest(regexPath, dataPath, flag);
     double compileTime = rTest.compileTest();
 
     /**
