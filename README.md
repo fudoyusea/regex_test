@@ -11,7 +11,7 @@ Cmake, python, ragel, boost
 
 编译安装：
 
-cmake #path;
+cmake $path;
 
 make && make install;
 
