@@ -94,11 +94,9 @@ You are supposed to change the path of regex and data in the shell file;
 
 ## 随机语义库生成
 说明：
-
 使用python的xeger库，根据正则表达式反向随机产生数据；
 
 使用：
-
 python data_gene.py;
 
 调整dataLen和dataNum控制单条字符串长度和总字符串个数；
