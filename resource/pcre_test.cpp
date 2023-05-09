@@ -18,9 +18,9 @@ class pcreTest {
 public:
     pcreTest(std::string rPath, std::string dPath, bool isFormat);
     ~pcreTest();
-    int compilePattern();
-    double compileTest();
-    std::vector<double> matchingTest();
+    int compile_regex();
+    double compiling();
+    std::vector<double> matching();
 
 private:
     std::string regexPath;
@@ -87,7 +87,7 @@ pcreTest::pcreTest(std::string rPath, std::string dPath, bool isFormat) : regexP
 
 pcreTest::~pcreTest() {}
 
-int pcreTest::compilePattern() {
+int pcreTest::compile_regex() {
     pcre* compileResult;
     const char* err;
     int erroffset;
@@ -102,19 +102,19 @@ int pcreTest::compilePattern() {
     return 0;
 }
 
-double pcreTest::compileTest() {
+double pcreTest::compiling() {
     // compile process;
     struct timeval compBeginTime, compEndTime;
     double compTime;
     gettimeofday(&compBeginTime, NULL);
-    compilePattern();
+    compile_regex();
     gettimeofday(&compEndTime, NULL);
     compTime = (compEndTime.tv_sec - compBeginTime.tv_sec) 
                 + (double)(compEndTime.tv_usec - compBeginTime.tv_usec)/1000000.0;
     return compTime*1000;
 }
 
-std::vector<double> pcreTest::matchingTest() {
+std::vector<double> pcreTest::matching() {
 
     // scanning process;
     double matchingTotalTime = 0.0;
@@ -181,7 +181,7 @@ int main(int argc, char **argv) {
      * compile;
     */
     pcreTest pTest(regexPath, dataPath, flag);
-    double compileTime = pTest.compileTest();
+    double compileTime = pTest.compiling();
 
     /**
      * scan and match;
@@ -190,7 +190,7 @@ int main(int argc, char **argv) {
     int testNum = 10000;
     std::vector<double> matchingResult;
     for(int i = 0; i < testNum; ++i) {
-        matchingResult = pTest.matchingTest();
+        matchingResult = pTest.matching();
         totalMatchTime += matchingResult[0] * 1000;
     }
 

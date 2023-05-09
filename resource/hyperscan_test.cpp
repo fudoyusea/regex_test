@@ -37,10 +37,16 @@ public:
 
     hyperscanTest(std::string rPath, std::string dPath, bool isFormat);
     ~hyperscanTest();
-    int compilePattern();
-    double compileTest();
-    std::vector<double> matchingTest();
-    static int onMatching(unsigned int id, unsigned long long from, unsigned long long to, unsigned int flags, void *context);
+
+    void alloc_hsScrach();
+
+    int compile_regex_with_multiline();
+    double compiling();
+
+    static int on_matching(unsigned int id, unsigned long long from, unsigned long long to, unsigned int flags, void *context);
+    hs_error_t scan_with_block(char* targetString);
+    hs_error_t scan_with_stream(char* targetString);
+    std::vector<double> matching();
 
 private:
 
@@ -52,6 +58,8 @@ private:
     std::vector<dataBlock> datasArray;  // data array
     hs_database_t *regexDatabase = NULL;// compile regex db
     uint32_t regexCount;                // total regex count
+
+    hs_scratch_t *hsScra;
 
 public:
 
@@ -128,7 +136,7 @@ hyperscanTest::hyperscanTest(std::string rPath, std::string dPath, bool isFormat
 
 hyperscanTest::~hyperscanTest() {}
 
-int hyperscanTest::compilePattern() {
+int hyperscanTest::compile_regex_with_multiline() {
     hs_error_t error;
     hs_compile_error_t *compError;
     error = hs_compile_multi(regexsArray.regexs, regexsArray.flags, regexsArray.ids, regexCount, 
@@ -140,45 +148,58 @@ int hyperscanTest::compilePattern() {
     return 0;
 }
 
-int hyperscanTest::onMatching(unsigned int id, unsigned long long from, unsigned long long to, unsigned int flags, void *context) {
-    ++matchedNum[id]; 
-    return 0;
+void hyperscanTest::alloc_hsScrach() {
+    hs_error_t err = hs_alloc_scratch(regexDatabase, (hs_scratch_t **) &hsScra);
+    if(err != HS_SUCCESS)
+        std::cout << "alloc scrach for regex database failed!" << std::endl;
+
 }
 
-double hyperscanTest::compileTest() {
+double hyperscanTest::compiling() {
     /**
      * compiling;
     */
     struct timeval compBeginTime, compEndTime;
     double compTime;
     gettimeofday(&compBeginTime, NULL);
-    compilePattern();
+    compile_regex_with_multiline();
     gettimeofday(&compEndTime, NULL);
     compTime = (compEndTime.tv_sec - compBeginTime.tv_sec) 
                 + (double)(compEndTime.tv_usec - compBeginTime.tv_usec)/1000000.0;
     return compTime*1000;
 }
 
-std::vector<double> hyperscanTest::matchingTest() {
-    matchedNum.assign(matchedNum.size(), 0);
+int hyperscanTest::on_matching(unsigned int id, unsigned long long from, unsigned long long to, unsigned int flags, void *context) {
+    ++matchedNum[id]; 
+    return 0;
+}
 
+hs_error_t hyperscanTest::scan_with_block(char* targetString) {
+    return hs_scan(regexDatabase, targetString, strlen(targetString), 
+    0, hsScra, on_matching, targetString);
+}
+
+hs_error_t hyperscanTest::scan_with_stream(char* targetString) {
+}
+
+std::vector<double> hyperscanTest::matching() {
     /*
      *initialize;
     */
-    hs_scratch_t * hsScra = NULL;
-    hs_alloc_scratch(regexDatabase, (hs_scratch_t **) &hsScra);
+    matchedNum.assign(matchedNum.size(), 0);
     double matchingSingleTime = 0.0;
     struct timeval matchingBeginTime, matchingEndTime;
     char *cString;
     hs_error_t err;
-    double totalScanBytes = 0;
+    double totalScanBytes = 0.0;
+
     /**
      * scanning;
     */
     for(int i = 0; i < datasArray.size(); ++i) {
         cString = const_cast<char *>(datasArray[i].dataLoad.c_str());
         gettimeofday(&matchingBeginTime, NULL);
-        err = hs_scan(regexDatabase, cString, strlen(cString), 0, hsScra, onMatching, cString);
+        err = scan_with_block(cString);
         gettimeofday(&matchingEndTime, NULL);
         if(err != HS_SUCCESS)
             std::cout << "matching failed, error code:" << err << std::endl;
@@ -195,18 +216,16 @@ std::vector<double> hyperscanTest::matchingTest() {
     std::cout << "matching single iteration timeout:" << matchingSingleTime*1000 << " ms" << std::endl;
 
     return std::vector<double>{matchingSingleTime, totalScanBytes, totalMatched};
-
 }
 
 std::vector<uint32_t> hyperscanTest::matchedNum(MAXREGEXNUM,0);
 
 int main(int argc, char **argv) {
-
     /*
      *read path config;
     */
-    std::string regexPath = argv[1];//"../regex/single_char.data";
-    std::string dataPath = argv[2];//"../data_gene/data_gen_results/dataGen_regex_javaclassconcate10000.txt";
+    std::string regexPath = argv[1];
+    std::string dataPath = argv[2];
 
     /**
      * regex config;
@@ -223,7 +242,8 @@ int main(int argc, char **argv) {
      * compile;
     */
     hyperscanTest hsTest(regexPath, dataPath, flag);
-    double compileTime = hsTest.compileTest();
+    double compileTime = hsTest.compiling();
+    hsTest.alloc_hsScrach();
 
     /**
      * scan and match;
@@ -232,7 +252,7 @@ int main(int argc, char **argv) {
     double totalMatchTime = 0.0;
     std::vector<double> matchingResult;
     for(int i = 0; i < testNum; ++i) {
-        matchingResult = hsTest.matchingTest();
+        matchingResult = hsTest.matching();
         totalMatchTime += matchingResult[0]*1000;
     }
 

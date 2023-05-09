@@ -20,9 +20,9 @@ class re2Test {
 public:
     re2Test(std::string regexPath, std::string dataPath, bool isFormat);
     ~re2Test();
-    int compilePattern();
-    double compileTest();
-    std::vector<double> matchingTest();
+    int compile_regex();
+    double compiling();
+    std::vector<double> matching();
 
 private:
     std::string regexPath;
@@ -87,26 +87,26 @@ re2Test::re2Test(std::string rPath, std::string dPath, bool isFormat): regexPath
 
 re2Test::~re2Test() {}
 
-int re2Test::compilePattern() {
+int re2Test::compile_regex() {
     for(int i = 0; i < regexCount; ++i) {
         re2Database[i].reset(new RE2(regexArray[i]));
     }
     return 0;
 }
 
-double re2Test::compileTest() {
+double re2Test::compiling() {
     // compile process;
     struct timeval compBeginTime, compEndTime;
     double compTime;
     gettimeofday(&compBeginTime, NULL);
-    compilePattern();
+    compile_regex();
     gettimeofday(&compEndTime, NULL);
     compTime = (compEndTime.tv_sec - compBeginTime.tv_sec) 
                 + (double)(compEndTime.tv_usec - compBeginTime.tv_usec)/1000000.0;
     return compTime*1000;
 }
 
-std::vector<double> re2Test::matchingTest() {
+std::vector<double> re2Test::matching() {
 
     // scanning
     double matchingTotalTime = 0.0;
@@ -158,7 +158,7 @@ int main(int argc, char **argv) {
      * compile;
     */
     re2Test rTest(regexPath, dataPath, flag);
-    double compileTime = rTest.compileTest();
+    double compileTime = rTest.compiling();
 
     /**
      * scan and match;
@@ -167,7 +167,7 @@ int main(int argc, char **argv) {
     int testNum = 10000;
     std::vector<double> matchingResult;
     for(int i = 0; i < testNum; ++i) {
-        matchingResult = rTest.matchingTest();
+        matchingResult = rTest.matching();
         totalMatchTime += matchingResult[0] * 1000;
     }
 
